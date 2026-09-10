@@ -45,7 +45,7 @@ function Brand() {
 function Portfolio() {
   const trackRef = useRef(null);
   const dialogRef = useRef(null);
-  const [position, setPosition] = useState({ index: 0, start: true, end: false, progress: 0 });
+  const [position, setPosition] = useState({ index: 0, total: works.length, start: true, end: false, progress: 0 });
   const [selected, setSelected] = useState(null);
 
   useEffect(() => {
@@ -53,7 +53,8 @@ function Portfolio() {
     const update = () => {
       const max = track.scrollWidth - track.clientWidth;
       const step = track.children[1].offsetLeft - track.children[0].offsetLeft;
-      setPosition({ index: Math.round(track.scrollLeft / step), start: track.scrollLeft < 5, end: track.scrollLeft >= max - 5, progress: max > 0 ? track.scrollLeft / max : 1 });
+      const total = Math.round(max / step) + 1;
+      setPosition({ index: Math.round(track.scrollLeft / step), total, start: track.scrollLeft < 5, end: track.scrollLeft >= max - 5, progress: max > 0 ? track.scrollLeft / max : 1 });
     };
     update();
     track.addEventListener('scroll', update, { passive: true });
@@ -90,7 +91,7 @@ function Portfolio() {
           <div className="work-caption"><div><h3>{work.name}</h3><p>{work.detail}</p></div><Icon name="sparkle" size={22} /></div>
         </article>)}
       </div>
-      <div className="carousel-footer"><span className="carousel-hint">Um pouquinho do que podemos criar juntas</span><div className="carousel-controls"><span className="carousel-count" aria-live="polite">0{position.index + 1}<span> / 06</span></span><div className="carousel-progress"><span style={{ transform: `translateX(${position.progress * 200}%)` }} /></div><button className="round-button previous" onClick={() => move(-1)} disabled={position.start} aria-label="Fotos anteriores"><Icon name="arrow" /></button><button className="round-button" onClick={() => move(1)} disabled={position.end} aria-label="Próximas fotos"><Icon name="arrow" /></button></div></div>
+      <div className="carousel-footer"><span className="carousel-hint">Um pouquinho do que podemos criar juntas</span><div className="carousel-controls"><span className="carousel-count" aria-live="polite">0{position.index + 1}<span> / {String(position.total).padStart(2, '0')}</span></span><div className="carousel-progress"><span style={{ transform: `translateX(${position.progress * 200}%)` }} /></div><button className="round-button previous" onClick={() => move(-1)} disabled={position.start} aria-label="Fotos anteriores"><Icon name="arrow" /></button><button className="round-button" onClick={() => move(1)} disabled={position.end} aria-label="Próximas fotos"><Icon name="arrow" /></button></div></div>
     </div>
     <dialog className="lightbox" ref={dialogRef} aria-label="Foto ampliada do portfólio" onClose={() => setSelected(null)} onClick={event => { if (event.target === event.currentTarget) close(); }} onKeyDown={event => { if (event.key === 'ArrowRight') { event.preventDefault(); nextPhoto(1); } if (event.key === 'ArrowLeft') { event.preventDefault(); nextPhoto(-1); } }}>
       {selected !== null && <div className="lightbox-content"><button className="lightbox-close round-button" onClick={close} autoFocus aria-label="Fechar foto ampliada"><Icon name="close" /></button><img src={works[selected].image} alt={works[selected].alt} /><div className="lightbox-caption"><button className="round-button previous" onClick={() => nextPhoto(-1)} aria-label="Foto anterior"><Icon name="arrow" /></button><div><h3>{works[selected].name}</h3><span>{selected + 1} / {works.length}</span></div><button className="round-button" onClick={() => nextPhoto(1)} aria-label="Próxima foto"><Icon name="arrow" /></button></div></div>}
